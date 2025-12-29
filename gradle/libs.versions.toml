@@ -9,6 +9,8 @@ lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.12.2"
 composeBom = "2024.09.00"
 roomdb = "2.6.1"
+dataStore = "1.1.2"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -32,6 +34,9 @@ androidx-room-compiler = { group = "androidx.room", name = "room-compiler", vers
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomdb" }
 androidx-room-testing = { group = "androidx.room", name = "room-testing", version.ref = "roomdb" }
 androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "roomdb" }
+
+androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "dataStore" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
