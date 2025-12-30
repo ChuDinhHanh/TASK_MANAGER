@@ -9,21 +9,22 @@ import androidx.room.Update
 import com.example.hb_studio_task.database.entity.TaskCollections
 import com.example.hb_studio_task.database.entity.TaskEntity
 import kotlinx.coroutines.flow.Flow
+
 @Dao
 interface TaskDAO {
     // C
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(taskCollections: TaskCollections)
+    suspend fun insertTaskCollections(taskCollections: TaskCollections): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTask(task: TaskEntity)
+    suspend fun insertTaskEntity(task: TaskEntity):Long
 
     // R
     @Query("SELECT * FROM task_collection")
     suspend fun getTaskCollections(): List<TaskCollections>
 
     @Query("SELECT * FROM task WHERE collection_id = :collectionId")
-    suspend fun getTask(collectionId: Int): TaskCollections
+    suspend fun getTask(collectionId: Int): List<TaskEntity>
 
     // U
     @Query("UPDATE task SET is_favorite = :isFavorite WHERE id = :taskId")
