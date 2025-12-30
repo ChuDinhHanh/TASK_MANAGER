@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
-// etpack DataStore (Preferences). là phương án thay thể của sharePreferency
+// Jetpack DataStore (Preferences). là phương án thay thể của sharePreferency
 class AppSettingImpl(private val context: Context) : AppSetting {
 
     private val Context.dataStoreAppSetting: DataStore<Preferences> by
