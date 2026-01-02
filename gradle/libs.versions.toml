@@ -11,9 +11,12 @@ composeBom = "2024.09.00"
 roomdb = "2.6.1"
 dataStore = "1.1.2"
 hiltAndroid = "2.54"
-#androidxHilt = "1.2.0"
-#lottieVersion = "6.6.2"
-#composeNavVersion = "2.8.8"
+navigationCompose = "2.9.6"
+runtime = "1.10.0"
+androidxHilt = "1.2.0"
+lottieVersion = "6.6.2"
+composeNavVersion = "2.8.8"
+animation = "1.10.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -43,10 +46,12 @@ androidx-datastore-preferences = { group = "androidx.datastore", name = "datasto
 #Hilt
 dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hiltAndroid" }
 dagger-hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hiltAndroid" }
-
-#androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "androidxHilt" }
-#androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "composeNavVersion" }
-#airbnb-android-lottie-compose = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottieVersion" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
+# Navigation
+androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "androidxHilt" }
+airbnb-android-lottie-compose = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottieVersion" }
+androidx-compose-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "animation" }
 
 
 [plugins]

@@ -13,7 +13,7 @@ class TaskRepoImpl(private val taskDAO: TaskDAO) : TaskRepo {
         taskDAO.getTaskCollections()
     }
 
-    override suspend fun getTaskByCollectionId(collectionId: Int): List<TaskEntity> = withContext(
+    override suspend fun getTaskByCollectionId(collectionId: Long): List<TaskEntity> = withContext(
         Dispatchers.IO
     ) {
         taskDAO.getTask(collectionId)
@@ -25,8 +25,31 @@ class TaskRepoImpl(private val taskDAO: TaskDAO) : TaskRepo {
         val id = taskDAO.insertTaskCollections(taskCollection);
         return if (id > 0) {
             taskCollection.copy(
-                id = id.toInt()
+                id = id
             );
+        } else {
+            null
+        }
+    }
+
+    override suspend fun addTask(
+        content: String,
+        collectionId: Long
+    ): TaskEntity? = withContext(Dispatchers.IO) {
+        val now = Calendar.getInstance().timeInMillis
+        val newTask = TaskEntity(
+            content = "Học lập trình Jetpack Compose",
+            isFavorite = true,
+            isCompleted = false,
+            createdAt = now,
+            updatedAt = now,
+            images = null,    // Nếu chưa có ảnh thì để null
+            documents = null, // Nếu chưa có tài liệu thì để null
+            collectionId = 1L  // Giả sử id của TaskCollection cha là 1
+        )
+        val id = taskDAO.insertTaskEntity(newTask)
+        if (id > 0) {
+            newTask.copy(id = id)
         } else {
             null
         }

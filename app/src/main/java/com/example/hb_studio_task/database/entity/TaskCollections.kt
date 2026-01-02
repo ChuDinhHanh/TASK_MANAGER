@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 data class TaskCollections(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "collection_id")
-    val id: Int? = null,
+    val id: Long = 0,
     @ColumnInfo(name = "title")
     val title: String,
     @ColumnInfo(name = "created_at")
@@ -16,3 +16,15 @@ data class TaskCollections(
     @ColumnInfo(name = "update_at")
     val updateAt: Long
 )
+
+enum class SortType(val value: Int) {
+    CREATED_DATE(0),
+    FAVORITE(1),
+}
+
+fun Int.toSortType(): SortType {
+    return when (this) {
+        1 -> SortType.FAVORITE
+        else -> SortType.CREATED_DATE
+    }
+}

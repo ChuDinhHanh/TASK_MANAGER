@@ -6,6 +6,7 @@ import com.example.hb_studio_task.database.entity.TaskEntity
 // Gom các hàm lấy db về chung 1 nguồn gốc tránh việc khó bảo trì!
 interface TaskRepo {
     suspend fun getTaskCollection(): List<TaskCollections>
-    suspend fun getTaskByCollectionId(collectionId: Int): List<TaskEntity>
+    suspend fun getTaskByCollectionId(collectionId: Long): List<TaskEntity>
     suspend fun addTaskCollection(title: String): TaskCollections?
+    suspend fun addTask(content: String, collectionId: Long): TaskEntity?
 }
