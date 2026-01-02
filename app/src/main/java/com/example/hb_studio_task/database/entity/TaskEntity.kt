@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "task")
 data class TaskEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Int? = null,
+    val id: Long = 0,
     @ColumnInfo(name = "title")
     val content: String,
     @ColumnInfo(name = "is_favorite")
@@ -26,5 +26,5 @@ data class TaskEntity(
     val documents: Int?,
 //    Liên kết với bảng cha của nó là TaskCollection
     @ColumnInfo(name = "collection_id")
-    val collectionId: Int
+    val collectionId: Long
 )

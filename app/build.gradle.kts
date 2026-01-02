@@ -53,6 +53,9 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.compose.animation)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -61,19 +64,24 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
-    // Add the Room dependency
+    /*Add the Room dependency*/
     implementation(libs.androidx.room)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.paging)
     testImplementation(libs.androidx.room.testing)
 
-//    Add dataStore preferences dependency
+    /*Add dataStore preferences dependency*/
     implementation(libs.androidx.datastore.preferences)
 
-//    Hilt
+    /*Hilt*/
     implementation(libs.dagger.hilt.android)
     kapt(libs.dagger.hilt.android.compiler)
-//    implementation(libs.androidx.hilt.navigation.compose)
+
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    implementation(libs.airbnb.android.lottie.compose)
+
+    implementation(libs.androidx.navigation.compose)
 
 }
