@@ -17,13 +17,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.example.hb_studio_task.ui.theme.component.common.RowComponent
+import com.example.hb_studio_task.ui.theme.pagerTab.state.TaskUiState
+import com.example.hb_studio_task.ui.theme.pagerTab.task.TaskActions
 
 @Composable
-fun LazyItemScope.TaskItemLayout(state: String) {
+fun LazyItemScope.TaskItemLayout(
+    state: TaskUiState,
+    action: TaskActions
+) {
     RowComponent(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {}
+            .clickable {
+                action.onTaskClicked(state)
+            }
             .animateItem(
                 tween(easing = LinearEasing),
                 tween(easing = LinearEasing),
@@ -36,6 +43,7 @@ fun LazyItemScope.TaskItemLayout(state: String) {
         Checkbox(
             checked = true,
             onCheckedChange = {
+                action.onCompleteTask(state)
             }
         )
         Column(
@@ -45,13 +53,16 @@ fun LazyItemScope.TaskItemLayout(state: String) {
             horizontalAlignment = Alignment.Start
         ) {
             Text(
-                text = state,
+                text = state.content,
                 modifier = Modifier.padding(horizontal = 4.dp),
-                textDecoration = TextDecoration.LineThrough.takeIf { true }
+                textDecoration = TextDecoration.LineThrough.takeIf { state.isCompleted }
             )
 
         }
         Text(if (true) "👍" else "👎", modifier = Modifier.clickable {
+            action.onFavorite(state)
         })
     }
 }
+
+
