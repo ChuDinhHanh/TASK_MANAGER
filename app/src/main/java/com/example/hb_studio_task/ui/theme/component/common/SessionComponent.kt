@@ -1,4 +1,4 @@
-package com.example.hb_studio_task.ui.theme.component
+package com.example.hb_studio_task.ui.theme.component.common
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding

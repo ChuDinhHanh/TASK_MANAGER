@@ -15,20 +15,3 @@ data class TaskUiState(
     val stringUpdatedAt: String,
     val createdAt: Long
 )
-
-//fun TaskEntity.toTaskUiState(): TaskUiState {
-//    return TaskUiState(
-//        id = this.id,
-//        content = this.content,
-//        isFavorite = this.isFavorite,
-//        isCompleted = this.isCompleted,
-//        collectionId = this.collectionId,
-//        updatedAt = this.updatedAt,
-//        stringUpdatedAt = this.updatedAt.millisToDateString(),
-//        createdAt = this.createdAt
-//    )
-//}
-//
-//fun Long.millisToDateString(): String {
-//    return SimpleDateFormat("EEE,dd MMM yyyy", Locale.getDefault()).format(Date(this)).toString()
-//}

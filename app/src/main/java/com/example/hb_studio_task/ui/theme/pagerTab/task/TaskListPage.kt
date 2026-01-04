@@ -7,9 +7,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.hb_studio_task.ui.theme.pagerTab.state.TaskPageUiState
+import com.example.hb_studio_task.ui.theme.pagerTab.task.TaskActions
 
 @Composable
-fun TaskListPage(state: List<String>) {
+fun TaskListPage(state: TaskPageUiState, actions: TaskActions) {
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
@@ -18,6 +20,7 @@ fun TaskListPage(state: List<String>) {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        showListTaskItems("HANH", state)
+        showListTaskItems("State", state.activeTaskList, actions)
+        showListTaskItems("State", state.completedTaskList, actions)
     }
 }
