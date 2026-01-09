@@ -20,7 +20,18 @@ fun TaskListPage(state: TaskPageUiState, actions: TaskActions) {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        showListTaskItems("State", state.activeTaskList, actions)
+        if (state.activeTaskList.isEmpty()) {
+            emptyState()
+        } else {
+            topCorner()
+            showListTaskItems("State", state.activeTaskList, actions)
+            bottomCorner()
+        }
+        spacerLazyList(16)
+        topCorner()
         showListTaskItems("State", state.completedTaskList, actions)
+        bottomCorner()
     }
 }
+
+

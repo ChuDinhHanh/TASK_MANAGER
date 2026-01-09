@@ -38,14 +38,14 @@ class TaskRepoImpl(private val taskDAO: TaskDAO) : TaskRepo {
     ): TaskEntity? = withContext(Dispatchers.IO) {
         val now = Calendar.getInstance().timeInMillis
         val newTask = TaskEntity(
-            content = "Học lập trình Jetpack Compose",
+            content = content,
             isFavorite = true,
             isCompleted = false,
             createdAt = now,
             updatedAt = now,
             images = null,    // Nếu chưa có ảnh thì để null
             documents = null, // Nếu chưa có tài liệu thì để null
-            collectionId = 1L  // Giả sử id của TaskCollection cha là 1
+            collectionId = collectionId  // Giả sử id của TaskCollection cha là 1
         )
         val id = taskDAO.insertTaskEntity(newTask)
         if (id > 0) {
