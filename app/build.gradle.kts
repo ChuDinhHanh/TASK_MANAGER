@@ -5,6 +5,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -83,5 +84,16 @@ dependencies {
     implementation(libs.airbnb.android.lottie.compose)
 
     implementation(libs.androidx.navigation.compose)
+
+    /* Image */
+    // Coil
+    implementation("io.coil-kt:coil-compose:2.4.0")
+
+    /* Lottie */
+    implementation("com.airbnb.android:lottie-compose:4.0.0")
+
+    /* Firebase */
+    implementation(platform("com.google.firebase:firebase-bom:34.7.0"))
+    implementation("com.google.firebase:firebase-analytics")
 
 }

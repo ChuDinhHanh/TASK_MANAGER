@@ -5,16 +5,18 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,8 +29,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.hb_studio_task.R
 import com.example.hb_studio_task.ui.theme.pagerTab.TaskItemLayout
 import com.example.hb_studio_task.ui.theme.pagerTab.state.TaskUiState
@@ -36,12 +39,14 @@ import com.example.hb_studio_task.ui.theme.pagerTab.task.TaskActions
 
 /* item - cần index *//* items Không cần index *//* itemsIndexed: cần key lẫn - cần custom key theo index + data*/
 
-fun LazyListScope.showListTaskItems(key: String, state: List<TaskUiState>, actions: TaskActions) {
+fun LazyListScope.showListTaskItems(
+    key: String, state: List<TaskUiState>, actions: TaskActions, groupId: Long
+) {
     itemsIndexed(
         state,
         key = { _, item -> "$key${item}" },
         contentType = { _, item -> item::class.java.name }) { _, item ->
-        TaskItemLayout(item, actions)
+        TaskItemLayout(item, actions, groupId)
     }
 }
 
@@ -59,7 +64,7 @@ fun LazyListScope.horizontalDivider() {
 
 
 /* Hàm xử lý khi rỗng*/
-fun LazyListScope.emptyState(key: String? = null, state: List<String>? = null) {
+fun LazyListScope.emptyState(key: String? = null, img: Int, state: List<String>? = null) {
     if (state.isNullOrEmpty()) {
         item(key) {
             /*1. Khởi tạo trạng thái*/
@@ -82,17 +87,20 @@ fun LazyListScope.emptyState(key: String? = null, state: List<String>? = null) {
                         .aspectRatio(1f),
                     elevation = CardDefaults.cardElevation(4.dp)
                 ) {
-                    Column(modifier = Modifier.fillMaxSize()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.White)
+                    ) {
                         Box(
                             modifier = Modifier
                                 .weight(0.8f)
-                                .fillMaxWidth()
+                                .fillMaxWidth(),
                         ) {
-
-                            Image(
-                                painter = painterResource(R.drawable.empty_task),
-                                contentDescription = "Empty images",
-                                modifier = Modifier.fillMaxSize(),
+                            AsyncImage(
+                                model = img,
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize()
                             )
                         }
                         Box(
@@ -127,17 +135,31 @@ fun LazyListScope.spacer(height: Int) {
 }
 
 
-fun LazyListScope.topCorner() {
+fun LazyListScope.topCorner(title: String? = null, desciption: String? = null) {
     item() {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(12.dp)
                 .background(
-                    color = Color.White,
-                    shape = RoundedCornerShape(12.dp, 12.dp, 0.dp, 0.dp)
+                    color = Color.White, shape = RoundedCornerShape(12.dp, 12.dp, 0.dp, 0.dp)
                 )
-        )
+        ) {
+            Row(
+                modifier = Modifier.padding(10.dp)
+            ) {
+                if (title != null) {
+                    Text(title, modifier = Modifier.weight(1f))
+                    Text("S")
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text("D")
+                }
+                if (desciption != null) {
+                    Text(desciption, modifier = Modifier.weight(1f))
+                }
+
+            }
+
+        }
     }
 }
 
@@ -147,11 +169,21 @@ fun LazyListScope.bottomCorner() {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(12.dp)
                 .background(
-                    color = Color.White,
-                    shape = RoundedCornerShape(0.dp, 0.dp, 12.dp, 12.dp)
+                    color = Color.White, shape = RoundedCornerShape(0.dp, 0.dp, 12.dp, 12.dp)
                 )
         )
+    }
+}
+
+fun List<TaskUiState>.updateTask(
+    targetId: Long, transform: (TaskUiState) -> TaskUiState
+): List<TaskUiState> {
+    return this.map {
+        if (it.id == targetId) {
+            transform(it)
+        } else {
+            it
+        }
     }
 }

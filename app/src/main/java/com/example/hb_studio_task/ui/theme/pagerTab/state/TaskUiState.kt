@@ -25,8 +25,8 @@ fun TaskEntity.toTaskUiState(): TaskUiState {
         isCompleted = this.isCompleted,
         collectionId = this.collectionId,
         updatedAt = this.updatedAt,
-        stringUpdatedAt = this.updatedAt.millisToDateString(),
-        createdAt = this.createdAt
+        stringUpdatedAt = Date(this.updatedAt).toString(),
+        createdAt = this.createdAt,
     )
 }
 

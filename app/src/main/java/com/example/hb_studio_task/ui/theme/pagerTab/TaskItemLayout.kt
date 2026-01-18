@@ -21,24 +21,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.example.hb_studio_task.ID_FAVORITE_LIST
 import com.example.hb_studio_task.ui.theme.component.common.RowComponent
 import com.example.hb_studio_task.ui.theme.pagerTab.state.TaskUiState
 import com.example.hb_studio_task.ui.theme.pagerTab.task.TaskActions
-import com.example.hb_studio_task.utils.getRelativeTime
 import com.example.hb_studio_task.utils.rememberRelativeTime
 
 
 @Composable
 fun LazyItemScope.TaskItemLayout(
-    state: TaskUiState,
-    action: TaskActions
+    state: TaskUiState, action: TaskActions, groupId: Long
 ) {
     RowComponent(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = Color.White)
             .clickable {
-                action.onTaskClicked(state)
+                action.onTaskClicked(state.id)
             }
             .animateItem(
                 tween(easing = LinearEasing),
@@ -50,11 +49,15 @@ fun LazyItemScope.TaskItemLayout(
     ) {
 
         Checkbox(
-            checked = state.isCompleted,
-            onCheckedChange = {
-                action.onCompleteTask(state)
-            }
-        )
+            checked = state.isCompleted, onCheckedChange = {
+                action.onCompleteTask(
+                    state.id, state.isCompleted, if (groupId == ID_FAVORITE_LIST) {
+                        state.collectionId
+                    } else {
+                        groupId
+                    }
+                )
+            })
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -65,16 +68,15 @@ fun LazyItemScope.TaskItemLayout(
             Text(
                 text = state.content,
                 modifier = Modifier.padding(end = 4.dp),
-                textDecoration = TextDecoration.LineThrough.takeIf { state.isCompleted }
-            )
+                textDecoration = TextDecoration.LineThrough.takeIf { state.isCompleted })
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 "Completed: ${rememberRelativeTime(state.createdAt)}",
                 style = MaterialTheme.typography.bodySmall
             )
         }
-        Text(if (true) "👍" else "👎", modifier = Modifier.clickable {
-            action.onFavorite(state)
+        Text(if (state.isFavorite) "⭐" else "★", modifier = Modifier.clickable {
+            action.onFavorite(state.id, state.isFavorite)
         })
     }
 }

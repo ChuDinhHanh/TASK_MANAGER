@@ -33,13 +33,12 @@ class TaskRepoImpl(private val taskDAO: TaskDAO) : TaskRepo {
     }
 
     override suspend fun addTask(
-        content: String,
-        collectionId: Long
+        content: String, collectionId: Long
     ): TaskEntity? = withContext(Dispatchers.IO) {
         val now = Calendar.getInstance().timeInMillis
         val newTask = TaskEntity(
             content = content,
-            isFavorite = true,
+            isFavorite = false,
             isCompleted = false,
             createdAt = now,
             updatedAt = now,
@@ -53,5 +52,21 @@ class TaskRepoImpl(private val taskDAO: TaskDAO) : TaskRepo {
         } else {
             null
         }
+    }
+
+    override suspend fun updateTaskFavorite(taskId: Long, isFavorite: Boolean): Boolean =
+        withContext(Dispatchers.IO) {
+            taskDAO.updateTaskIsFavorite(taskId, isFavorite) > 0
+        }
+
+    override suspend fun updateTaskCompleted(taskId: Long, isCompleted: Boolean): Boolean =
+        withContext(Dispatchers.IO) {
+            taskDAO.updateTaskCompleted(taskId, isCompleted) > 0
+        }
+
+    override suspend fun updateCollectionCompleted(
+        collectionId: Long, isCompleted: Boolean
+    ): Boolean = withContext(Dispatchers.IO) {
+        taskDAO.updateCollectionCompleted(collectionId, isCompleted) > 0
     }
 }

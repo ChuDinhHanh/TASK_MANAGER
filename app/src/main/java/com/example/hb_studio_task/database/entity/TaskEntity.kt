@@ -18,7 +18,7 @@ data class TaskEntity(
     val isCompleted: Boolean,
     @ColumnInfo(name = "created_at")
     val createdAt: Long,
-    @ColumnInfo(name = "update_at")
+    @ColumnInfo(name = "updated_at")
     val updatedAt: Long,
     @ColumnInfo(name = "is_images")
     val images: Int?,

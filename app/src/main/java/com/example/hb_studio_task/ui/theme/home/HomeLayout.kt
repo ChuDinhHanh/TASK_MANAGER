@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -34,39 +34,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.hb_studio_task.MainViewModel
 import com.example.hb_studio_task.ui.theme.component.common.SessionComponent
 import com.example.hb_studio_task.ui.theme.floatAction.FloatActionButton
 import com.example.hb_studio_task.ui.theme.pagerTab.PagerTabLayout
 import com.example.hb_studio_task.ui.theme.pagerTab.state.TaskGroupUiState
 import com.example.hb_studio_task.ui.theme.pagerTab.task.TaskActions
 import com.example.hb_studio_task.ui.theme.topbar.TopBar
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeLayout(
-    listTaskGroup: List<TaskGroupUiState>, action: TaskActions
+    listTaskGroup: List<TaskGroupUiState>, action: TaskActions, currentIndexPager: Int
 ) {
+    Log.d("TAG", currentIndexPager.toString())
     var isShowAddNoteBottomSheet by remember { mutableStateOf(false) }
     Scaffold(modifier = Modifier.fillMaxSize(), floatingActionButton = {
-        FloatActionButton(
-            modifier = Modifier
-                .background(
-                    color = Color.Black.copy(0.2f), shape = RoundedCornerShape(12.dp)
-                )
-                .size(58.dp)
-                .clip(RoundedCornerShape(12.dp)),
-            true,
-        ) {
-            isShowAddNoteBottomSheet = true
-        }
-
-        /*innerPadding = nội dung UI của bạn không bị che khuất bởi các yếu tố hệ thống như thanh trạng thái*/
+        if (listTaskGroup.isNotEmpty() && currentIndexPager != 0) {
+            FloatActionButton(
+                modifier = Modifier
+                    .background(
+                        color = Color.Black.copy(0.2f), shape = RoundedCornerShape(12.dp)
+                    )
+                    .size(58.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                true,
+            ) {
+                isShowAddNoteBottomSheet = true
+            }
+        }/*innerPadding = nội dung UI của bạn không bị che khuất bởi các yếu tố hệ thống như thanh trạng thái*/
     }) { innerPadding ->
 
         Column(
@@ -88,7 +84,7 @@ fun HomeLayout(
             if (isShowAddNoteBottomSheet) {
                 var inputTaskContent by remember { mutableStateOf("") }
                 var isLoading by remember { mutableStateOf(false) }
-                val scope = rememberCoroutineScope()/*Show pager*/
+                val scope = rememberCoroutineScope()
                 ModalBottomSheet({
                     isShowAddNoteBottomSheet = false
                 }) {
@@ -98,6 +94,7 @@ fun HomeLayout(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text("Input Task Content")
+                            Spacer(modifier = Modifier.height(16.dp))
                             TextField(
                                 modifier = Modifier.fillMaxWidth(),
                                 value = inputTaskContent,
@@ -105,20 +102,21 @@ fun HomeLayout(
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Button(
-                                enabled = !isLoading,
+                                shape = RoundedCornerShape(6.dp),
+                                enabled = !isLoading && inputTaskContent.trim().isNotEmpty(),
                                 modifier = Modifier.fillMaxWidth(),
+                                elevation = ButtonDefaults.buttonElevation(6.dp),
                                 onClick = {
                                     isLoading = true
-                                    scope.launch {
-                                        delay(3000)
-                                        try {
-                                            action.addNewTaskToCurrentCollection(inputTaskContent)
-                                            isShowAddNoteBottomSheet = false
-                                        } catch (e: ArithmeticException) {
+                                    try {
+                                        action.addNewTaskToCurrentCollection(
+                                            inputTaskContent
+                                        )
+                                        isShowAddNoteBottomSheet = false
+                                    } catch (e: ArithmeticException) {
 
-                                        } finally {
-                                            isLoading = false
-                                        }
+                                    } finally {
+                                        isLoading = false
                                     }
                                 }) {
                                 Crossfade(
