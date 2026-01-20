@@ -28,8 +28,7 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
         }
     }
@@ -57,6 +56,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.animation)
+    implementation(libs.androidx.runtime)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -83,17 +83,21 @@ dependencies {
 
     implementation(libs.airbnb.android.lottie.compose)
 
-    implementation(libs.androidx.navigation.compose)
-
     /* Image */
-    // Coil
     implementation("io.coil-kt:coil-compose:2.4.0")
 
     /* Lottie */
     implementation("com.airbnb.android:lottie-compose:4.0.0")
 
     /* Firebase */
-    implementation(platform("com.google.firebase:firebase-bom:34.7.0"))
-    implementation("com.google.firebase:firebase-analytics")
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.config)
+    // Thư viện hỗ trợ Notification của Android
+    implementation("androidx.core:core-ktx:1.12.0")/*Nav*/
+    implementation(libs.androidx.navigation.compose)
 
+    implementation("androidx.media3:media3-exoplayer:1.2.0")
+    implementation("androidx.media3:media3-ui:1.2.0")
 }

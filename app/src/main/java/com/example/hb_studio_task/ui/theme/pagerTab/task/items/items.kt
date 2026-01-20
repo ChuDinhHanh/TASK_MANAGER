@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -135,7 +136,12 @@ fun LazyListScope.spacer(height: Int) {
 }
 
 
-fun LazyListScope.topCorner(title: String? = null, desciption: String? = null) {
+fun LazyListScope.topCorner(
+    title: String? = null,
+    description: String? = null,
+    isOpen: Boolean = false,
+    onClick: () -> Unit
+) {
     item() {
         Box(
             modifier = Modifier
@@ -143,6 +149,9 @@ fun LazyListScope.topCorner(title: String? = null, desciption: String? = null) {
                 .background(
                     color = Color.White, shape = RoundedCornerShape(12.dp, 12.dp, 0.dp, 0.dp)
                 )
+                .clickable() {
+                    onClick()
+                }
         ) {
             Row(
                 modifier = Modifier.padding(10.dp)
@@ -153,8 +162,9 @@ fun LazyListScope.topCorner(title: String? = null, desciption: String? = null) {
                     Spacer(modifier = Modifier.width(16.dp))
                     Text("D")
                 }
-                if (desciption != null) {
-                    Text(desciption, modifier = Modifier.weight(1f))
+                if (description != null) {
+                    Text(description, modifier = Modifier.weight(1f))
+                    Text(if (isOpen) "Close" else "Expand")
                 }
 
             }
@@ -169,6 +179,7 @@ fun LazyListScope.bottomCorner() {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(12.dp)
                 .background(
                     color = Color.White, shape = RoundedCornerShape(0.dp, 0.dp, 12.dp, 12.dp)
                 )

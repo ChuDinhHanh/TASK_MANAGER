@@ -1,8 +1,12 @@
 package com.example.hb_studio_task.ui.theme.pagerTab
 
 import TaskListPage
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -19,6 +23,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.hb_studio_task.ui.theme.component.common.SessionComponent
 import com.example.hb_studio_task.ui.theme.pagerTab.state.TaskGroupUiState
@@ -55,46 +60,53 @@ fun PagerTabLayout(
         }
     }
 
-    /* UI */
-    PrimaryScrollableTabRow(
-        selectedTabIndex = pagerState.currentPage,
-        edgePadding = 0.dp, // Set to 0.dp to remove all default edge padding
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
     ) {
-        repeat(state.size + 1) { index ->
-            Tab(text = {
-                if (index < state.size) {
-                    Text(state.getOrNull(index)?.tab?.title ?: "New page")
-                } else {
-                    Text("+ New Task")
-                }
-            }, selected = index == pagerState.currentPage, onClick = {
-                if (index < state.size) {
-                    scope.launch {
-                        pagerState.animateScrollToPage(index)
+        /* UI */
+        PrimaryScrollableTabRow(
+            selectedTabIndex = pagerState.currentPage,
+            edgePadding = 0.dp, // Set to 0.dp to remove all default edge padding
+        ) {
+            repeat(state.size + 1) { index ->
+                Tab(text = {
+                    if (index < state.size) {
+                        Text(state.getOrNull(index)?.tab?.title ?: "New page")
+                    } else {
+                        Text("+ New Task")
                     }
-                } else {
-                    isFirstTime = false
-                    taskDelegate.requestAddNewCollection()
+                }, selected = index == pagerState.currentPage, onClick = {
+                    if (index < state.size) {
+                        scope.launch {
+                            pagerState.animateScrollToPage(index)
+                        }
+                    } else {
+                        isFirstTime = false
+                        taskDelegate.requestAddNewCollection()
+                    }
+                })
+            }/*Bonus tag*/
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        HorizontalPager(
+            state = pagerState, beyondViewportPageCount = 2
+        ) { pageIndex ->
+            if (state.getOrNull(pageIndex) != null) {
+                SessionComponent(modifier = Modifier.padding(vertical = 16.dp)) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        TaskListPage(
+                            state[pageIndex].page,
+                            taskDelegate,
+                            state[pageIndex].tab.id,
+                            title = state[pageIndex].tab.title
+                        )
+                    }
                 }
-            })
-        }/*Bonus tag*/
-    }
-    HorizontalPager(
-        state = pagerState, beyondViewportPageCount = 2
-    ) { pageIndex ->
-        if (state.getOrNull(pageIndex) != null) {
-            SessionComponent(modifier = Modifier.padding(vertical = 16.dp)) {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    TaskListPage(
-                        state[pageIndex].page,
-                        taskDelegate,
-                        state[pageIndex].tab.id,
-                        title = state[pageIndex].tab.title
-                    )
-                }
+            } else {
+                Text("HELLO2")
             }
-        } else {
-            Text("HELLO2")
         }
     }
 }

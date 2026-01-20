@@ -1,17 +1,18 @@
 package com.example.hb_studio_task
 
-import android.nfc.Tag
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.hb_studio_task.repository.ConfigRepository
+import com.example.hb_studio_task.repository.NotificationRepository
 import com.example.hb_studio_task.repository.TaskRepo
+import com.example.hb_studio_task.repository.VideoConfig
 import com.example.hb_studio_task.ui.theme.component.home.FireworkInstance
 import com.example.hb_studio_task.ui.theme.pagerTab.state.TabUiState
 import com.example.hb_studio_task.ui.theme.pagerTab.state.TaskGroupUiState
 import com.example.hb_studio_task.ui.theme.pagerTab.state.TaskPageUiState
-import com.example.hb_studio_task.ui.theme.pagerTab.state.TaskUiState
 import com.example.hb_studio_task.ui.theme.pagerTab.state.toTabUiState
 import com.example.hb_studio_task.ui.theme.pagerTab.state.toTaskUiState
 import com.example.hb_studio_task.ui.theme.pagerTab.task.TaskActions
@@ -37,11 +38,19 @@ const val ID_FAVORITE_LIST = -1000L
 // Step 1: config hilt + dagger
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val taskRepo: TaskRepo
+    private val taskRepo: TaskRepo,
+    private val configRepo: ConfigRepository,
+    private val notification: NotificationRepository
 ) : ViewModel(), TaskActions {
+
+    /* Notification */
+    private val _token = MutableStateFlow<String?>(null)
+    val token = _token.asStateFlow()
+
     /* Firework */
     private val _firework = MutableStateFlow<List<FireworkInstance>>(emptyList())
     val firework = _firework.asStateFlow()
+
 
     /* Share flow cho mấy nơi khác xài kiểu giống redux */
     private val _eventFlow: MutableSharedFlow<MainEvent> = MutableSharedFlow()
@@ -50,6 +59,12 @@ class MainViewModel @Inject constructor(
     /* MutableStateFlow: HotFlow */
     private val _listTabGroup: MutableStateFlow<List<TaskGroupUiState>> =
         MutableStateFlow(emptyList());
+
+    /* Remote config */
+    private val _appTitle = MutableStateFlow("Loading...") // Giá trị ban đầu
+    val appTitle = _appTitle.asStateFlow()
+    private val _videoConfig = MutableStateFlow(VideoConfig())
+    val videoConfig = _videoConfig.asStateFlow()
 
     /* asStateFlow = 🔒 Ẩn khả năng ghi – chỉ cho đọc
     1 Nguyên tắc đóng gói bên trong model có thể can thiệp nhưng bên ngoài chỉ được đocj thôi
@@ -60,8 +75,15 @@ class MainViewModel @Inject constructor(
     private var _currentSelectedCollectionIndex = MutableStateFlow(0);
     val currentSelectedCollectionIndex = _currentSelectedCollectionIndex.asStateFlow()
 
-    /*Fav*/
+    fun fetchAndSaveToken() {
+        notification.getFCMToken { newToken ->
+            _token.value = newToken
+            Log.d("FCM_TEST", "Token -${_token.value}")
+        }
+    }
 
+
+    /*Fav*/
 
     val listTabGroup: StateFlow<List<TaskGroupUiState>> = _listTabGroup.map { groups ->
         val favTasks = groups.flatMap { group ->
@@ -69,10 +91,10 @@ class MainViewModel @Inject constructor(
         }
 
         val favGroup = TaskGroupUiState(
-            tab = TabUiState(ID_FAVORITE_LIST, "FAV", true), page = TaskPageUiState(
+            tab = TabUiState(ID_FAVORITE_LIST, "FAV", true),
+            page = TaskPageUiState(
                 activeTaskList = favTasks.filter { !it.isCompleted }
-                    .sortedByDescending { it.updatedAt },
-                completedTaskList = emptyList()
+                    .sortedByDescending { it.updatedAt }, completedTaskList = emptyList()
             )
         )
         listOf(favGroup) + groups
@@ -85,6 +107,16 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            /*Remote config*/
+            configRepo.getAppTitle { newTitle ->
+                _appTitle.value = newTitle
+            }
+            /*Get video*/
+            configRepo.getVideoConfig { videoConfig ->
+                _videoConfig.value = videoConfig
+                Log.d("TAG", "Video -${videoConfig}")
+            }
+            /*Data*/
             val listTasksCollections = taskRepo.getTaskCollection()/* Add favorite task */
             val listTabGroupUiState = listTasksCollections.let { value ->
                 value.map { taskCollection ->

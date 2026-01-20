@@ -1,12 +1,12 @@
 package com.example.hb_studio_task.ui.theme.home
 
-import android.util.Log
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +35,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.hb_studio_task.MainViewModel
 import com.example.hb_studio_task.ui.theme.component.common.SessionComponent
 import com.example.hb_studio_task.ui.theme.floatAction.FloatActionButton
 import com.example.hb_studio_task.ui.theme.pagerTab.PagerTabLayout
@@ -44,31 +47,41 @@ import com.example.hb_studio_task.ui.theme.topbar.TopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeLayout(
-    listTaskGroup: List<TaskGroupUiState>, action: TaskActions, currentIndexPager: Int
+fun HomeScreen(
+    listTaskGroup: List<TaskGroupUiState>,
+    action: TaskActions,
+    currentIndexPager: Int,
+    mainViewModel: MainViewModel
 ) {
-    Log.d("TAG", currentIndexPager.toString())
+    val title by mainViewModel.appTitle.collectAsStateWithLifecycle()
     var isShowAddNoteBottomSheet by remember { mutableStateOf(false) }
-    Scaffold(modifier = Modifier.fillMaxSize(), floatingActionButton = {
-        if (listTaskGroup.isNotEmpty() && currentIndexPager != 0) {
-            FloatActionButton(
-                modifier = Modifier
-                    .background(
-                        color = Color.Black.copy(0.2f), shape = RoundedCornerShape(12.dp)
-                    )
-                    .size(58.dp)
-                    .clip(RoundedCornerShape(12.dp)),
-                true,
-            ) {
-                isShowAddNoteBottomSheet = true
+    val url by mainViewModel.videoConfig.collectAsState() // Lấy URL video
+    Scaffold(
+        // QUAN TRỌNG: Phải có dòng này để thấy video phía dưới
+        containerColor = Color.Transparent,
+        modifier = Modifier.fillMaxSize(),
+        floatingActionButton = {
+            if (listTaskGroup.isNotEmpty() && currentIndexPager != 0) {
+                FloatActionButton(
+                    modifier = Modifier
+                        .background(
+                            color = Color.Black.copy(0.2f), shape = RoundedCornerShape(12.dp)
+                        )
+                        .size(58.dp)
+                        .clip(RoundedCornerShape(12.dp)),
+                    true,
+                ) {
+                    isShowAddNoteBottomSheet = true
+                }
             }
-        }/*innerPadding = nội dung UI của bạn không bị che khuất bởi các yếu tố hệ thống như thanh trạng thái*/
-    }) { innerPadding ->
-
+        }) { innerPadding ->
+        // innerPadding ở đây chính là độ cao của Status Bar
+        // nó sẽ đẩy Column của bạn xuống dưới Status Bar để không bị đè chữ
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .background(Color.Transparent),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -77,7 +90,7 @@ fun HomeLayout(
                 TopBar(
                     Modifier
                         .fillMaxWidth()
-                        .height(42.dp)
+                        .fillMaxHeight(0.1f), title = title
                 )
             }/*Show pager*/
             PagerTabLayout(listTaskGroup, action)/*Show bottom sheet*/
@@ -142,8 +155,9 @@ fun HomeLayout(
                         }
                     }
                 }
-            }
 
+            }
         }
     }
 }
+
