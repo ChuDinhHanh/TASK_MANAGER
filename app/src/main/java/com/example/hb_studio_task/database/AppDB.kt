@@ -13,8 +13,7 @@ private const val DATABASE_NAME = "app.db"
 private const val DATABASE_VERSION = 1
 
 @Database(
-    entities = [TaskCollections::class, TaskEntity::class],
-    version = 1
+    entities = [TaskCollections::class, TaskEntity::class], version = 1
 )
 
 abstract class AppDB : RoomDatabase() {
@@ -31,9 +30,7 @@ abstract class AppDB : RoomDatabase() {
         }
 
         private fun buidDatabase(context: Context): AppDB = Room.databaseBuilder(
-            context,
-            AppDB::class.java,
-            DATABASE_NAME
+            context, AppDB::class.java, DATABASE_NAME
         ).build()
     }
 }

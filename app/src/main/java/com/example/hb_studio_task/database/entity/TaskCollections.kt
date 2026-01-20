@@ -12,9 +12,11 @@ data class TaskCollections(
     @ColumnInfo(name = "title")
     val title: String,
     @ColumnInfo(name = "created_at")
-    val createdAt: Long? = null,
+    val createdAt: Long? = System.currentTimeMillis(),
     @ColumnInfo(name = "update_at")
-    val updateAt: Long
+    val updateAt: Long,
+    @ColumnInfo(name = "had_finish")
+    val hadFinish: Boolean = false
 )
 
 enum class SortType(val value: Int) {
