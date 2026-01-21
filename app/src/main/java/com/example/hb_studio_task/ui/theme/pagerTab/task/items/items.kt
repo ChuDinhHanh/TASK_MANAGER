@@ -13,16 +13,21 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,10 +35,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.hb_studio_task.R
 import com.example.hb_studio_task.ui.theme.pagerTab.TaskItemLayout
 import com.example.hb_studio_task.ui.theme.pagerTab.state.TaskUiState
 import com.example.hb_studio_task.ui.theme.pagerTab.task.TaskActions
@@ -140,6 +145,8 @@ fun LazyListScope.topCorner(
     title: String? = null,
     description: String? = null,
     isOpen: Boolean = false,
+    taskActions: TaskActions,
+    collectionId: Long,
     onClick: () -> Unit
 ) {
     item() {
@@ -151,22 +158,38 @@ fun LazyListScope.topCorner(
                 )
                 .clickable() {
                     onClick()
-                }
-        ) {
+                }) {
             Row(
-                modifier = Modifier.padding(10.dp)
+                modifier = Modifier.padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 if (title != null) {
-                    Text(title, modifier = Modifier.weight(1f))
-                    Text("S")
+                    Text(title, style = MaterialTheme.typography.titleMedium)
+                    Spacer(modifier = Modifier.weight(1f))
+                    ElevatedButton(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .wrapContentWidth(),
+                        onClick = {
+                            taskActions.requestUpdateCollection(collectionId)
+                        }) {
+                        Text("S", style = TextStyle(color = Color.Black))
+                    }
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text("D")
+                    ElevatedButton(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .wrapContentWidth(),
+                        onClick = {
+                            taskActions.requestUpdateCollection(collectionId)
+                        }) {
+                        Text("D", style = TextStyle(color = Color.Black))
+                    }
                 }
                 if (description != null) {
                     Text(description, modifier = Modifier.weight(1f))
                     Text(if (isOpen) "Close" else "Expand")
                 }
-
             }
 
         }

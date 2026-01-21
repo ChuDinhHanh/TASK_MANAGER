@@ -34,7 +34,6 @@ fun MainNavigationGraph(mainViewModel: MainViewModel = hiltViewModel()) {/* Main
     val density = LocalDensity.current
     val statusBarHeightPx = WindowInsets.statusBars.getTop(density).toFloat()
 
-
     Box(modifier = Modifier.fillMaxSize()) {
         key(url.url) {
             if (url.url.isNotEmpty()) {
@@ -61,5 +60,8 @@ fun MainNavigationGraph(mainViewModel: MainViewModel = hiltViewModel()) {/* Main
 }
 
 enum class NavScreen(val route: String) {
-    HOME("home"), TASK("task/{taskId}"), COLLECTION("collection/{collectionId}"), SETTING("setting")
+    HOME("home"),
+    TASK("task/{taskId}"),
+    COLLECTION("collection/{collectionId}"),
+    SETTING("setting")
 }

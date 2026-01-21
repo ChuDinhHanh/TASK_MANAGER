@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.HB_STUDIO_TASK" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.HB_STUDIO_TASKTheme" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="windowSplashScreenBackground">#FFFFFF</item>
+        <item name="postSplashScreenTheme">@style/Theme.HB_STUDIO_TASKTheme</item>
+    </style>
 </resources>

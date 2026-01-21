@@ -9,8 +9,10 @@ interface TaskRepo {
     suspend fun getTaskByCollectionId(collectionId: Long): List<TaskEntity>
     suspend fun addTaskCollection(title: String): TaskCollections?
     suspend fun addTask(content: String, collectionId: Long): TaskEntity?
+
     /*CRUD*/
     suspend fun updateTaskFavorite(taskId: Long, isFavorite: Boolean): Boolean
     suspend fun updateTaskCompleted(taskId: Long, isCompleted: Boolean): Boolean
     suspend fun updateCollectionCompleted(collectionId: Long, isCompleted: Boolean): Boolean
+    suspend fun deleteCollectionById(collectionId: Long): Boolean
 }

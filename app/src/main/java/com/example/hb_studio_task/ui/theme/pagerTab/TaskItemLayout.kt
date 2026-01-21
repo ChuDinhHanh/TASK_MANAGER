@@ -45,7 +45,7 @@ fun LazyItemScope.TaskItemLayout(
                 tween(easing = LinearEasing)
             ),
         verticalAlignmentProp = Alignment.CenterVertically,
-        horizontalArrangementProp = Arrangement.Start,
+        horizontalArrangementProp = Arrangement.SpaceBetween,
     ) {
 
         Checkbox(
@@ -59,19 +59,16 @@ fun LazyItemScope.TaskItemLayout(
                 )
             })
         Column(
-            modifier = Modifier
-                .weight(1f)
-                .wrapContentHeight(),
+            modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start
         ) {
             Text(
                 text = state.content,
-                modifier = Modifier.padding(end = 4.dp),
                 textDecoration = TextDecoration.LineThrough.takeIf { state.isCompleted })
             Spacer(modifier = Modifier.height(2.dp))
             Text(
-                "Completed: ${rememberRelativeTime(state.createdAt)}",
+                text = "Completed: ${rememberRelativeTime(state.createdAt)}",
                 style = MaterialTheme.typography.bodySmall
             )
         }

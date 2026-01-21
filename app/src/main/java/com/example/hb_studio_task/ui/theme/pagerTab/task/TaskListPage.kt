@@ -32,7 +32,9 @@ fun TaskListPage(state: TaskPageUiState, actions: TaskActions, groupId: Long, ti
             if (state.activeTaskList.isEmpty()) {
                 emptyState(img = R.drawable.complete_all_task)
             } else {/* Show task*/
-                topCorner(title = title, onClick = {})
+                topCorner(title = title, taskActions = actions, collectionId = groupId, onClick = {
+
+                })
                 showListTaskItems("State", state.activeTaskList, actions, groupId)
                 bottomCorner()
             }/* Show task completed */
@@ -41,9 +43,12 @@ fun TaskListPage(state: TaskPageUiState, actions: TaskActions, groupId: Long, ti
                 topCorner(
                     description = "Completed (${state.completedTaskList.size}) task${if (state.completedTaskList.size >= 2) "s" else ""}",
                     isOpen = isOpen,
+                    taskActions = actions,
+                    collectionId = groupId,
                     onClick = {
                         isOpen = !isOpen
-                    })
+                    }
+                )
                 if (isOpen) {
                     showListTaskItems("State", state.completedTaskList, actions, groupId)
                 }

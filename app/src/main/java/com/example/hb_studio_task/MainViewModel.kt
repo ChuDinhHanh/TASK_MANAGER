@@ -1,14 +1,14 @@
 package com.example.hb_studio_task
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.retain.retain
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hb_studio_task.repository.ConfigRepository
 import com.example.hb_studio_task.repository.NotificationRepository
 import com.example.hb_studio_task.repository.TaskRepo
 import com.example.hb_studio_task.repository.VideoConfig
+import com.example.hb_studio_task.ui.theme.AppMenuItem
 import com.example.hb_studio_task.ui.theme.component.home.FireworkInstance
 import com.example.hb_studio_task.ui.theme.pagerTab.state.TabUiState
 import com.example.hb_studio_task.ui.theme.pagerTab.state.TaskGroupUiState
@@ -19,12 +19,16 @@ import com.example.hb_studio_task.ui.theme.pagerTab.task.TaskActions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMap
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -42,6 +46,8 @@ class MainViewModel @Inject constructor(
     private val configRepo: ConfigRepository,
     private val notification: NotificationRepository
 ) : ViewModel(), TaskActions {
+    private val _isReady = MutableStateFlow(false)
+    val isReady = _isReady.asStateFlow()
 
     /* Notification */
     private val _token = MutableStateFlow<String?>(null)
@@ -82,9 +88,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-
     /*Fav*/
-
     val listTabGroup: StateFlow<List<TaskGroupUiState>> = _listTabGroup.map { groups ->
         val favTasks = groups.flatMap { group ->
             group.page.activeTaskList.filter { it.isFavorite } + group.page.completedTaskList.filter { it.isFavorite }
@@ -107,35 +111,50 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            /*Remote config*/
-            configRepo.getAppTitle { newTitle ->
-                _appTitle.value = newTitle
+            launch {
+                /*Remote config*/
+                configRepo.getAppTitle { newTitle ->
+                    _appTitle.value = newTitle
+                }/*Get video*/
+                configRepo.getVideoConfig { videoConfig ->
+                    _videoConfig.value = videoConfig
+                }
+                combine(_videoConfig, _appTitle) { config, title ->
+                    config.url.isNotEmpty() && title.isNotEmpty()
+                }.collect { ready ->
+                    if (ready) {
+                        _isReady.value = true
+                    }
+                }
             }
-            /*Get video*/
-            configRepo.getVideoConfig { videoConfig ->
-                _videoConfig.value = videoConfig
-                Log.d("TAG", "Video -${videoConfig}")
+            launch {
+                /*Data*/
+                val listTasksCollections = taskRepo.getTaskCollection()/* Add favorite task */
+                val listTabGroupUiState = listTasksCollections.let { value ->
+                    value.map { taskCollection ->
+                        val collectionId = taskCollection.id
+                        val listTaskUiState =
+                            taskRepo.getTaskByCollectionId(collectionId).map { taskEntity ->
+                                taskEntity.toTaskUiState()
+                            }
+                        val tabUiState = taskCollection.toTabUiState()
+                        TaskGroupUiState(
+                            tabUiState, TaskPageUiState(
+                                activeTaskList = listTaskUiState.filter { !it.isCompleted },
+                                completedTaskList = listTaskUiState.filter { it.isCompleted })
+                        )
+                    }
+                }
+                _listTabGroup.value = listTabGroupUiState
             }
-            /*Data*/
-            val listTasksCollections = taskRepo.getTaskCollection()/* Add favorite task */
-            val listTabGroupUiState = listTasksCollections.let { value ->
-                value.map { taskCollection ->
-                    val collectionId = taskCollection.id
-                    val listTaskUiState =
-                        taskRepo.getTaskByCollectionId(collectionId).map { taskEntity ->
-                            taskEntity.toTaskUiState()
-                        }
-                    val tabUiState = taskCollection.toTabUiState()
-                    TaskGroupUiState(
-                        tabUiState, TaskPageUiState(
-                            activeTaskList = listTaskUiState.filter { !it.isCompleted },
-                            completedTaskList = listTaskUiState.filter { it.isCompleted })
-                    )
+
+            launch {
+                delay(10000)
+                if (!_isReady.value) {
+                    _isReady.value = true
                 }
             }
 
-
-            _listTabGroup.value = listTabGroupUiState
         }
     }
 
@@ -262,6 +281,30 @@ class MainViewModel @Inject constructor(
             _eventFlow.emit(MainEvent.RequestAddNewCollection)
         }
     }
+
+    override fun requestUpdateCollection(collectionId: Long) {
+        viewModelScope.launch {
+            val list = listOf(AppMenuItem("Delete Collection") {
+                val result = deleteCollectionById(collectionId)
+            }, AppMenuItem("Rename Collection") {
+                Log.d("TAG", "Request Rename Collection $collectionId")
+            })
+            _eventFlow.emit(MainEvent.RequestShowButtonSheetOption(list))
+        }
+    }
+
+    private fun deleteCollectionById(collectionId: Long) {
+        viewModelScope.launch {
+            if (taskRepo.deleteCollectionById(collectionId)) {
+                _listTabGroup.value.let { item1 ->
+                    val x = item1.filter { item2 -> item2.tab.id != collectionId }
+                    _listTabGroup.value = x
+                }
+
+            }
+        }
+    }
+
 }
 
 
@@ -269,5 +312,6 @@ sealed class MainEvent {
     data object RequestAddNewCollection : MainEvent()
     data object RequestVibrate : MainEvent()
     data object AllTaskCompleted : MainEvent()
+    data class RequestShowButtonSheetOption(val list: List<AppMenuItem>) : MainEvent()
 }
 
