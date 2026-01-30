@@ -1,9 +1,13 @@
 package com.example.hb_studio_task
 
 import android.util.Log
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.retain.retain
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.hb_studio_task.dataStore.AppConstants
+import com.example.hb_studio_task.database.entity.SortType
 import com.example.hb_studio_task.repository.ConfigRepository
 import com.example.hb_studio_task.repository.NotificationRepository
 import com.example.hb_studio_task.repository.TaskRepo
@@ -19,6 +23,7 @@ import com.example.hb_studio_task.ui.theme.pagerTab.task.TaskActions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,8 +40,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import updateTask
 import javax.inject.Inject
-
-const val ID_FAVORITE_LIST = -1000L
 
 
 // Step 1: config hilt + dagger
@@ -95,7 +98,7 @@ class MainViewModel @Inject constructor(
         }
 
         val favGroup = TaskGroupUiState(
-            tab = TabUiState(ID_FAVORITE_LIST, "FAV", true),
+            tab = TabUiState(AppConstants.ID_FAVORITE_COLLECTION, "FAV", true),
             page = TaskPageUiState(
                 activeTaskList = favTasks.filter { !it.isCompleted }
                     .sortedByDescending { it.updatedAt }, completedTaskList = emptyList()
@@ -285,7 +288,10 @@ class MainViewModel @Inject constructor(
     override fun requestUpdateCollection(collectionId: Long) {
         viewModelScope.launch {
             val list = listOf(AppMenuItem("Delete Collection") {
-                val result = deleteCollectionById(collectionId)
+                viewModelScope.launch {
+                    val result = deleteCollectionById(collectionId)
+                    _eventFlow.emit(MainEvent.ShowSnakeBar("Xóa thành công"))
+                }
             }, AppMenuItem("Rename Collection") {
                 Log.d("TAG", "Request Rename Collection $collectionId")
             })
@@ -293,15 +299,50 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun deleteCollectionById(collectionId: Long) {
-        viewModelScope.launch {
-            if (taskRepo.deleteCollectionById(collectionId)) {
-                _listTabGroup.value.let { item1 ->
-                    val x = item1.filter { item2 -> item2.tab.id != collectionId }
-                    _listTabGroup.value = x
-                }
-
+    private suspend fun deleteCollectionById(collectionId: Long): Boolean {
+        val result = taskRepo.deleteCollectionById(collectionId)
+        if (result) {
+            _listTabGroup.value.let { item1 ->
+                val newData = item1.filter { item2 -> item2.tab.id != collectionId }
+                _listTabGroup.value = newData
             }
+        }
+        return result
+    }
+
+
+    private fun sortCollectionBy(collectionId: Long, sortType: SortType) {
+        _listTabGroup.update { currentData ->
+            currentData.map { group ->
+                if (group.tab.id == collectionId) {
+                    val newData = when (sortType) {
+                        SortType.CREATED_DATE -> group.page.activeTaskList.sortedByDescending { it.createdAt }
+                        SortType.FAVORITE -> group.page.activeTaskList.sortedByDescending { it.isFavorite }
+                    }
+                    group.copy(page = group.page.copy(activeTaskList = newData))
+                } else {
+                    group
+                }
+            }
+        }
+    }
+
+
+    override fun requestSortTasks(collectionId: Long) {
+        viewModelScope.launch {
+            _eventFlow.emit(
+                MainEvent.RequestShowButtonSheetOption(
+                    listOf(
+                        AppMenuItem("Sort by favourite") {
+                            sortCollectionBy(collectionId, SortType.FAVORITE)
+                        },
+
+                        AppMenuItem("Sort by timeStamp") {
+                            sortCollectionBy(collectionId, SortType.CREATED_DATE)
+                        },
+                    )
+                )
+            )
         }
     }
 
@@ -313,5 +354,6 @@ sealed class MainEvent {
     data object RequestVibrate : MainEvent()
     data object AllTaskCompleted : MainEvent()
     data class RequestShowButtonSheetOption(val list: List<AppMenuItem>) : MainEvent()
+    data class ShowSnakeBar(val notification: String) : MainEvent()
 }
 

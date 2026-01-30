@@ -16,7 +16,13 @@ import com.example.hb_studio_task.ui.theme.pagerTab.state.TaskPageUiState
 import com.example.hb_studio_task.ui.theme.pagerTab.task.TaskActions
 
 @Composable
-fun TaskListPage(state: TaskPageUiState, actions: TaskActions, groupId: Long, title: String) {
+fun TaskListPage(
+    state: TaskPageUiState,
+    actions: TaskActions,
+    groupId: Long,
+    title: String,
+    isFav: Boolean = false
+) {
     var isOpen by remember { mutableStateOf(false) }
     LazyColumn(
         modifier = Modifier
@@ -32,11 +38,11 @@ fun TaskListPage(state: TaskPageUiState, actions: TaskActions, groupId: Long, ti
             if (state.activeTaskList.isEmpty()) {
                 emptyState(img = R.drawable.complete_all_task)
             } else {/* Show task*/
-                topCorner(title = title, taskActions = actions, collectionId = groupId, onClick = {
-
-                })
+                if (!isFav) {
+                    topCorner(
+                        title = title, taskActions = actions, collectionId = groupId, onClick = {})
+                }
                 showListTaskItems("State", state.activeTaskList, actions, groupId)
-                bottomCorner()
             }/* Show task completed */
             if (state.completedTaskList.isNotEmpty()) {
                 spacerLazyList(16)
@@ -47,12 +53,10 @@ fun TaskListPage(state: TaskPageUiState, actions: TaskActions, groupId: Long, ti
                     collectionId = groupId,
                     onClick = {
                         isOpen = !isOpen
-                    }
-                )
+                    })
                 if (isOpen) {
                     showListTaskItems("State", state.completedTaskList, actions, groupId)
                 }
-                bottomCorner()
             }
         }
     }

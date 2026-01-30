@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -86,11 +87,15 @@ fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             /*Topbar*/
-            SessionComponent {
+            SessionComponent(
+                modifier = Modifier.background(Color.Transparent)
+            ) {
                 TopBar(
                     Modifier
                         .fillMaxWidth()
-                        .fillMaxHeight(0.1f), title = title
+                        .fillMaxHeight(0.1f)
+                        .background(Color.Transparent),
+                    title = title
                 )
             }/*Show pager*/
             PagerTabLayout(listTaskGroup, action)/*Show bottom sheet*/
@@ -114,7 +119,7 @@ fun HomeScreen(
                                 onValueChange = { value -> inputTaskContent = value },
                             )
                             Spacer(modifier = Modifier.height(16.dp))
-                            Button(
+                            ElevatedButton(
                                 shape = RoundedCornerShape(6.dp),
                                 enabled = !isLoading && inputTaskContent.trim().isNotEmpty(),
                                 modifier = Modifier.fillMaxWidth(),

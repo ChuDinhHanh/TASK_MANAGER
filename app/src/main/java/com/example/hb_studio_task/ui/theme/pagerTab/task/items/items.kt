@@ -18,24 +18,27 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -173,7 +176,11 @@ fun LazyListScope.topCorner(
                         onClick = {
                             taskActions.requestUpdateCollection(collectionId)
                         }) {
-                        Text("S", style = TextStyle(color = Color.Black))
+                        Icon(
+                            imageVector = Icons.Default.Settings, // Use a built-in Material icon
+                            contentDescription = "Sort",
+                            modifier = Modifier.size(15.dp) // Optional: Adjust icon size
+                        )
                     }
                     Spacer(modifier = Modifier.width(16.dp))
                     ElevatedButton(
@@ -181,9 +188,13 @@ fun LazyListScope.topCorner(
                             .fillMaxHeight()
                             .wrapContentWidth(),
                         onClick = {
-                            taskActions.requestUpdateCollection(collectionId)
+                            taskActions.requestSortTasks(collectionId)
                         }) {
-                        Text("D", style = TextStyle(color = Color.Black))
+                        Icon(
+                            imageVector = Icons.Default.Menu, // Use a built-in Material icon
+                            contentDescription = "Action",
+                            modifier = Modifier.size(15.dp) // Optional: Adjust icon size
+                        )
                     }
                 }
                 if (description != null) {
@@ -196,19 +207,6 @@ fun LazyListScope.topCorner(
     }
 }
 
-
-fun LazyListScope.bottomCorner() {
-    item() {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(12.dp)
-                .background(
-                    color = Color.White, shape = RoundedCornerShape(0.dp, 0.dp, 12.dp, 12.dp)
-                )
-        )
-    }
-}
 
 fun List<TaskUiState>.updateTask(
     targetId: Long, transform: (TaskUiState) -> TaskUiState

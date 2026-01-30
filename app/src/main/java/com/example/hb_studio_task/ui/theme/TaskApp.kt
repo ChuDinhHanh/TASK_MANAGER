@@ -2,6 +2,7 @@ package com.example.hb_studio_task.ui.theme
 
 import android.util.Log
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,8 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -34,6 +37,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -46,12 +50,15 @@ import com.example.hb_studio_task.R
 import com.example.hb_studio_task.ui.theme.component.common.SessionComponent
 import com.example.hb_studio_task.ui.theme.home.HomeScreen
 import com.example.hb_studio_task.utils.FireworkTrigger
+import com.example.hb_studio_task.utils.ShowSnakeBar
 import com.example.hb_studio_task.utils.vibrateSuccess
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TasksApp(mainViewModel: MainViewModel) {/* Variable */
     val taskDelegate = remember { mainViewModel }
+    val snackbarHostState = remember { SnackbarHostState() }
     val listTaskGroup by taskDelegate.listTabGroup.collectAsStateWithLifecycle()/* Firework */
     val fireworkComp by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.firework_lottie))
     val fireworks by taskDelegate.firework.collectAsState()
@@ -77,13 +84,26 @@ fun TasksApp(mainViewModel: MainViewModel) {/* Variable */
                     taskDelegate.triggerFirework()
                 }
 
+                is MainEvent.ShowSnakeBar -> {
+                    ShowSnakeBar(it.notification, snackbarHostState)
+                }
+
                 is MainEvent.RequestShowButtonSheetOption -> {
                     listActionTask = it.list
                 }
             }
         }
-    }/* Main Screen */
-    HomeScreen(listTaskGroup, taskDelegate, currentIndexPager.value, mainViewModel)
+    }
+
+    Scaffold(
+        containerColor = Color.Transparent,
+        snackbarHost = {
+            androidx.compose.material3.SnackbarHost(snackbarHostState)
+        }) { _ ->
+        Box(modifier = Modifier.fillMaxSize()) {
+            HomeScreen(listTaskGroup, taskDelegate, currentIndexPager.value, mainViewModel)
+        }
+    }
 
     /* Firework*/
     fireworks.forEach { firework ->
