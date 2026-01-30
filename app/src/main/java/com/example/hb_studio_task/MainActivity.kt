@@ -11,7 +11,7 @@ import androidx.activity.viewModels
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.hb_studio_task.ui.theme.component.statusBar.StatusBarProtection
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
@@ -25,15 +25,19 @@ class MainActivity : ComponentActivity() {
     private val mainViewModel: MainViewModel by viewModels()
     private lateinit var firebaseAnalytics: FirebaseAnalytics
 
-
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
+        /* setKeepOnScreenCondition~ auto check*/
+        splashScreen.setKeepOnScreenCondition {
+            mainViewModel.isReady.value
+        }
         enableEdgeToEdge()
+        firebaseAnalytics = Firebase.analytics
         mainViewModel.fetchAndSaveToken()
         requestNotificationPermissionIfNeeded()
         setContent {
-            firebaseAnalytics = Firebase.analytics
             firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_ITEM) {}
             MainNavigationGraph()
         }

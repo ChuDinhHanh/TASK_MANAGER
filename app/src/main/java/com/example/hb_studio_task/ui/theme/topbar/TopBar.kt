@@ -28,7 +28,7 @@ fun TopBar(modifier: Modifier, title: String) {
                 .align(Alignment.CenterEnd),
             contentAlignment = Alignment.Center
         ) {
-            Text("123")
+//            Text("NAME")
         }
     }
 }

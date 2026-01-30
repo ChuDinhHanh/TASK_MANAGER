@@ -2,14 +2,16 @@ package com.example.hb_studio_task.ui.theme.pagerTab
 
 import TaskListPage
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Tab
@@ -25,6 +27,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.hb_studio_task.dataStore.AppConstants
 import com.example.hb_studio_task.ui.theme.component.common.SessionComponent
 import com.example.hb_studio_task.ui.theme.pagerTab.state.TaskGroupUiState
 import com.example.hb_studio_task.ui.theme.pagerTab.task.TaskActions
@@ -67,13 +70,27 @@ fun PagerTabLayout(
     ) {
         /* UI */
         PrimaryScrollableTabRow(
+            containerColor = Color.Transparent,
             selectedTabIndex = pagerState.currentPage,
             edgePadding = 0.dp, // Set to 0.dp to remove all default edge padding
         ) {
             repeat(state.size + 1) { index ->
                 Tab(text = {
                     if (index < state.size) {
-                        Text(state.getOrNull(index)?.tab?.title ?: "New page")
+                        val count = state.getOrNull(index)?.page?.activeTaskList?.size ?: 0
+
+                        BadgedBox(
+                            badge = {
+                                if (count != 0) {
+                                    Badge(
+                                        modifier = Modifier.offset(x = 5.dp)
+                                    )
+                                } else {
+                                    null
+                                }
+                            }) {
+                            Text(state.getOrNull(index)?.tab?.title ?: "New page")
+                        }
                     } else {
                         Text("+ New Task")
                     }
@@ -100,7 +117,8 @@ fun PagerTabLayout(
                             state[pageIndex].page,
                             taskDelegate,
                             state[pageIndex].tab.id,
-                            title = state[pageIndex].tab.title
+                            title = state[pageIndex].tab.title,
+                            isFav = state[pageIndex].tab.id == AppConstants.ID_FAVORITE_COLLECTION
                         )
                     }
                 }

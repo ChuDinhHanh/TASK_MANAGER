@@ -69,4 +69,9 @@ class TaskRepoImpl(private val taskDAO: TaskDAO) : TaskRepo {
     ): Boolean = withContext(Dispatchers.IO) {
         taskDAO.updateCollectionCompleted(collectionId, isCompleted) > 0
     }
+
+    override suspend fun deleteCollectionById(collectionId: Long): Boolean =
+        withContext(Dispatchers.IO) {
+            taskDAO.deleteTaskCollectionById(collectionId) > 0
+        }
 }

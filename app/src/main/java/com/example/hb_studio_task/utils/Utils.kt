@@ -10,10 +10,13 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import com.airbnb.lottie.LottieComposition
@@ -21,6 +24,7 @@ import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieAnimatable
 import com.airbnb.lottie.compose.rememberLottieComposition
+import com.example.hb_studio_task.MainEvent
 import com.example.hb_studio_task.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -92,8 +96,7 @@ fun vibrateSuccess(context: Context, durationMillis: Long = 10) {
 
 @Composable
 fun FireworkTrigger(
-    composition: LottieComposition?,
-    onAnimatedFinish: () -> Unit
+    composition: LottieComposition?, onAnimatedFinish: () -> Unit
 ) {
     val composition by rememberLottieComposition(
         spec = LottieCompositionSpec.RawRes(R.raw.firework_lottie)
@@ -120,4 +123,8 @@ fun FireworkTrigger(
         )
     }
 
+}
+
+suspend fun ShowSnakeBar(message: String, snackbarHostState: SnackbarHostState) {
+    snackbarHostState.showSnackbar(message)
 }

@@ -14,5 +14,8 @@ interface TaskActions {
     fun updateCurrentCollectionIndex(index: Int) = Unit
     fun addNewCollection(title: String) = Unit
     fun requestAddNewCollection() = Unit
+    fun requestUpdateCollection(collectionId: Long) = Unit
+    fun requestSortTasks(collectionId: Long) = Unit
+
 }
 

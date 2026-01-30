@@ -4,16 +4,16 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.hb_studio_task.dataStore.AppConstants
 import com.example.hb_studio_task.database.dao.TaskDAO
 import com.example.hb_studio_task.database.entity.TaskCollections
 import com.example.hb_studio_task.database.entity.TaskEntity
 
 
-private const val DATABASE_NAME = "app.db"
-private const val DATABASE_VERSION = 1
-
 @Database(
-    entities = [TaskCollections::class, TaskEntity::class], version = 1
+    entities = [TaskCollections::class, TaskEntity::class], version = AppConstants.DATABASE_VERSION
 )
 
 abstract class AppDB : RoomDatabase() {
@@ -30,7 +30,14 @@ abstract class AppDB : RoomDatabase() {
         }
 
         private fun buidDatabase(context: Context): AppDB = Room.databaseBuilder(
-            context, AppDB::class.java, DATABASE_NAME
-        ).build()
+            context, AppDB::class.java, AppConstants.DATABASE_NAME
+        ).addMigrations(MIGRATE_1_2).build()
+    }
+
+}
+
+private val MIGRATE_1_2 = object : Migration(1, 2) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+//        db.execSQL()
     }
 }

@@ -18,9 +18,8 @@ import androidx.media3.ui.PlayerView
 @OptIn(UnstableApi::class)
 @Composable
 fun VideoPlayerComponent(
-    url: String = "https://pullzoneremoteconfig.b-cdn.net/snow_gift.mp4", modifier: Modifier
+    url: String, modifier: Modifier
 ) {
-    Log.d("TAG","VideoPlayerComponent")
     val context = LocalContext.current
 
     val exoPlayer = remember(url) {

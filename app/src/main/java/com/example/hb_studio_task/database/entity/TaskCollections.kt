@@ -16,7 +16,7 @@ data class TaskCollections(
     @ColumnInfo(name = "update_at")
     val updateAt: Long,
     @ColumnInfo(name = "had_finish")
-    val hadFinish: Boolean = false
+    val hadFinish: Boolean = false,
 )
 
 enum class SortType(val value: Int) {
